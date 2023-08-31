@@ -28,16 +28,9 @@ class UsersController {
     const { name, cpf, email, password } = request.body;
     const createdAt = new Date();
     try {
-      const user = await UsersRepository.createUser({
-        name,
-        cpf,
-        email,
-        password,
-        createdAt,
-      });
+      await UsersRepository.createUser(name, cpf, email, password, createdAt);
       return response.status(200).json(name);
     } catch (err) {
-      console.log(err);
       return response.status(401).json({
         message: err.message,
       });
@@ -48,13 +41,36 @@ class UsersController {
     try {
       const page = parseInt(request.query.page) || 1;
       const limit = parseInt(request.query.take) || 5;
+      const ativo = request.query.ativo;
       const offset = (page - 1) * limit;
-      const users = await UsersRepository.getUsers(limit, offset);
+      const users = await UsersRepository.getUsers(limit, offset, ativo);
       return response
         .status(200)
         .json({ users: users.users, totalDeUsuarios: users.totalDeUsuarios });
     } catch (err) {
-      console.log(err);
+      return response.status(401).json({
+        message: err.message,
+      });
+    }
+  }
+
+  async getUser(request, response) {
+    try {
+      const user = await UsersRepository.getUser(request.query.IDUSUARIO);
+      return response.status(200).json(...user);
+    } catch (err) {
+      return response.status(401).json({
+        message: err.message,
+      });
+    }
+  }
+
+  async updateUser(request, response) {
+    const { USUARIO, CPF, EMAIL, ATIVO } = request.body;
+    try {
+      await UsersRepository.updateUser(USUARIO, CPF, EMAIL, ATIVO);
+      return response.status(200).json();
+    } catch (err) {
       return response.status(401).json({
         message: err.message,
       });
