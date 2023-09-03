@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const UsersRepository = require('../repositories/UsersRepository');
 
-
 class UsersController {
   async index(request, response) {
     const { email, password } = request.body;

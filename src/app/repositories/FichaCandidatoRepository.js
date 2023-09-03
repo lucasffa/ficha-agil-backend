@@ -108,4 +108,4 @@ class FichaCandidatoRepository {
     }
   }
 }
-module.exports = new FichaCandidatoRepository();
+module.exports = new FichaCandidatoRepository()
