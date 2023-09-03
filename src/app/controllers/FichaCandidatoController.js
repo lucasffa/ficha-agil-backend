@@ -55,6 +55,52 @@ class FichaCandidatoController {
       });
     }
   }
+
+  async getEstadoCivil(request, response) {
+    try {
+      const EstadoCivil = await FichaCandidatoRepository.getEstadoCivil();
+      return response.status(200).json(EstadoCivil);
+    } catch (err) {
+      return response.status(401).json({
+        message: err.message,
+      });
+    }
+  }
+
+  async getCoberturaMoradia(request, response) {
+    try {
+      const CoberturaMoradia = await FichaCandidatoRepository.getCoberturaMoradia();
+      return response.status(200).json(CoberturaMoradia);
+    } catch (err) {
+      return response.status(401).json({
+        message: err.message,
+      });
+    }
+  }
+
+  async getEscolaridade(request, response) {
+    try {
+      const Escolaridade = await FichaCandidatoRepository.getEscolaridade();
+      return response.status(200).json(Escolaridade);
+    } catch (err) {
+      return response.status(401).json({
+        message: err.message,
+      });
+    }
+  }
+  
+  async getParentesco(request, response) {
+    try {
+      const Parentesco = await FichaCandidatoRepository.getParentesco();
+      return response.status(200).json(Parentesco);
+    } catch (err) {
+      return response.status(401).json({
+        message: err.message,
+      });
+    }
+  }
+
+  
 }
 
 module.exports = new FichaCandidatoController();

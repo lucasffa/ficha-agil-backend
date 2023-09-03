@@ -143,5 +143,51 @@ class FichaCandidatoRepository {
       throw error;
     }
   }
+
+  async getEstadoCivil() {
+    try {
+      const rows = await pool.query(`
+      SELECT * FROM ESTADOCIVIL WHERE ATIVO = 'S';	
+      `);
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
+  async getCoberturaMoradia() {
+    try {
+      const rows = await pool.query(`
+      SELECT * FROM COBERTURAMORADIA WHERE ATIVO = 'S';	
+      `);
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getEscolaridade() {
+    try {
+      const rows = await pool.query(`
+      SELECT * FROM ESCOLARIDADE WHERE ATIVO = 'S';	
+      `);
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getParentesco() {
+    try {
+      const rows = await pool.query(`
+      SELECT * FROM PARENTESCO WHERE ATIVO = 'S';	
+      `);
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  
 }
 module.exports = new FichaCandidatoRepository();
