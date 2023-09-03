@@ -1,7 +1,5 @@
 const { Router } = require('express');
 
-
-
 const UsersController = require('./app/controllers/UsersController');
 const FichaCandidatoController = require('./app/controllers/FichaCandidatoController');
 const router = Router();
@@ -16,7 +14,12 @@ router.put('/updateUser', UsersController.updateUser);
 
 router.post(
   '/createFichaCandidato',
-  FichaCandidatoController.createFichaCandidato 
+  FichaCandidatoController.createFichaCandidato
 );
-
+router.get('/candidatos', FichaCandidatoController.getFichaCandidato);
+router.get(
+  '/situacaoTrabalhista',
+  FichaCandidatoController.getSituacaoTrabalhista
+);
+router.get('/racaEtnia', FichaCandidatoController.getRacaEtnia);
 module.exports = router;
