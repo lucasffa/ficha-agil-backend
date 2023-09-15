@@ -22,7 +22,7 @@ class FichaCandidatoController {
       const limit = parseInt(request.query.take) || 5;
       //const ativo = request.query.ativo;
       const offset = (page - 1) * limit;
-      const users = await UsersRepository.getFichaCandidatos(limit, offset);
+      const users = await FichaCandidatoRepository.getFichaCandidatos(limit, offset);
       return response
         .status(200)
         .json({ users: users.users, totalDeUsuarios: users.totalDeUsuarios });

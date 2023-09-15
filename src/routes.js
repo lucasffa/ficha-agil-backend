@@ -3,28 +3,24 @@ const { Router } = require('express');
 const UsersController = require('./app/controllers/UsersController');
 const FichaCandidatoController = require('./app/controllers/FichaCandidatoController');
 const router = Router();
+const authenticateToken = require('./app/middlewares/authenticateToken');
 
 //login and users' routes
 router.post('/login', UsersController.index);
-router.post('/createUser', UsersController.createUser);
-router.get('/users', UsersController.getUsers);
-router.get('/user', UsersController.getUser);
-router.put('/updateUser', UsersController.updateUser);
+router.post('/createUser', authenticateToken, UsersController.createUser);
+router.get('/users', authenticateToken, UsersController.getUsers);
+router.get('/user', authenticateToken, UsersController.getUser);
+router.put('/updateUser', authenticateToken, UsersController.updateUser);
 
 //ficha routes
-router.post(
-  '/createFichaCandidato',
-  FichaCandidatoController.createFichaCandidato
-);
-router.get('/candidatos', FichaCandidatoController.getFichaCandidato);
-router.get(
-  '/situacaoTrabalhista',
-  FichaCandidatoController.getSituacaoTrabalhista
-);
-router.get('/racaEtnia', FichaCandidatoController.getRacaEtnia);
-router.get('/estadocivil', FichaCandidatoController.getEstadoCivil);
-router.get('/coberturamoradia', FichaCandidatoController.getCoberturaMoradia);
-router.get('/escolaridade', FichaCandidatoController.getEscolaridade);
-router.get('/parentesco', FichaCandidatoController.getParentesco);
+router.post('/createFichaCandidato', authenticateToken, FichaCandidatoController.createFichaCandidato);
+router.get('/candidatos', authenticateToken, FichaCandidatoController.getFichaCandidato);
+router.get('/situacaoTrabalhista', authenticateToken, FichaCandidatoController.getSituacaoTrabalhista);
+router.get('/racaEtnia', authenticateToken, FichaCandidatoController.getRacaEtnia);
+router.get('/estadocivil', authenticateToken, FichaCandidatoController.getEstadoCivil);
+router.get('/coberturamoradia', authenticateToken, FichaCandidatoController.getCoberturaMoradia);
+router.get('/escolaridade', authenticateToken, FichaCandidatoController.getEscolaridade);
+router.get('/parentesco', authenticateToken, FichaCandidatoController.getParentesco);
+
 
 module.exports = router;

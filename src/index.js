@@ -1,5 +1,7 @@
 const express = require('express');
 require('express-async-errors');
+require('dotenv').config();
+
 
 const routes = require('./routes');
 const cors = require('cors');
@@ -15,6 +17,8 @@ app.use((error, request, response, next) => {
   console.log(error);
   response.sendStatus(500);
 });
+
+
 
 app.listen(8000, () =>
   console.log('🔥 Server started at http://localhost:8000')
