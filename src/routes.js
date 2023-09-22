@@ -13,14 +13,41 @@ router.get('/user', authenticateToken, UsersController.getUser);
 router.put('/updateUser', authenticateToken, UsersController.updateUser);
 
 //ficha routes
-router.post('/createFichaCandidato', authenticateToken, FichaCandidatoController.createFichaCandidato);
-router.get('/candidatos', authenticateToken, FichaCandidatoController.getFichaCandidato);
-router.get('/situacaoTrabalhista', authenticateToken, FichaCandidatoController.getSituacaoTrabalhista);
-router.get('/racaEtnia', authenticateToken, FichaCandidatoController.getRacaEtnia);
-router.get('/estadocivil', authenticateToken, FichaCandidatoController.getEstadoCivil);
-router.get('/coberturamoradia', authenticateToken, FichaCandidatoController.getCoberturaMoradia);
-router.get('/escolaridade', authenticateToken, FichaCandidatoController.getEscolaridade);
-router.get('/parentesco', authenticateToken, FichaCandidatoController.getParentesco);
-
+router.post(
+  '/createFichaCandidato',
+  authenticateToken,
+  FichaCandidatoController.createFichaCandidato
+);
+router.get(
+  '/situacaoTrabalhista',
+  authenticateToken,
+  FichaCandidatoController.getSituacaoTrabalhista
+);
+router.get(
+  '/racaEtnia',
+  authenticateToken,
+  FichaCandidatoController.getRacaEtnia
+);
+router.get(
+  '/estadocivil',
+  authenticateToken,
+  FichaCandidatoController.getEstadoCivil
+);
+router.get(
+  '/coberturamoradia',
+  authenticateToken,
+  FichaCandidatoController.getCoberturaMoradia
+);
+router.get(
+  '/escolaridade',
+  authenticateToken,
+  FichaCandidatoController.getEscolaridade
+);
+router.get(
+  '/parentesco',
+  authenticateToken,
+  FichaCandidatoController.getParentesco
+);
+router.get('/fichas', authenticateToken, FichaCandidatoController.getFichas);
 
 module.exports = router;

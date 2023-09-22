@@ -16,23 +16,6 @@ class FichaCandidatoController {
     }
   }
 
-  async getFichaCandidato(request, response) {
-    try {
-      const page = parseInt(request.query.page) || 1;
-      const limit = parseInt(request.query.take) || 5;
-      //const ativo = request.query.ativo;
-      const offset = (page - 1) * limit;
-      const users = await FichaCandidatoRepository.getFichaCandidatos(limit, offset);
-      return response
-        .status(200)
-        .json({ users: users.users, totalDeUsuarios: users.totalDeUsuarios });
-    } catch (err) {
-      return response.status(401).json({
-        message: err.message,
-      });
-    }
-  }
-
   async getSituacaoTrabalhista(request, response) {
     try {
       const SituacaoTrabalhista =
@@ -69,7 +52,8 @@ class FichaCandidatoController {
 
   async getCoberturaMoradia(request, response) {
     try {
-      const CoberturaMoradia = await FichaCandidatoRepository.getCoberturaMoradia();
+      const CoberturaMoradia =
+        await FichaCandidatoRepository.getCoberturaMoradia();
       return response.status(200).json(CoberturaMoradia);
     } catch (err) {
       return response.status(401).json({
@@ -88,7 +72,7 @@ class FichaCandidatoController {
       });
     }
   }
-  
+
   async getParentesco(request, response) {
     try {
       const Parentesco = await FichaCandidatoRepository.getParentesco();
@@ -100,7 +84,23 @@ class FichaCandidatoController {
     }
   }
 
-  
+  async getFichas(request, response) {
+    try {
+      const page = parseInt(request.query.page) || 1;
+      const limit = parseInt(request.query.take) || 5;
+      //const ativo = request.query.ativo;
+      const offset = (page - 1) * limit;
+      const fichas = await FichaCandidatoRepository.getFichas(limit, offset);
+      return response.status(200).json({
+        fichasCandidatos: fichas.fichasCandidatos,
+        totalDefichasCandidatos: fichas.totalDefichasCandidatos,
+      });
+    } catch (err) {
+      return response.status(401).json({
+        message: err.message,
+      });
+    }
+  }
 }
 
 module.exports = new FichaCandidatoController();
