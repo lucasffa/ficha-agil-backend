@@ -3,15 +3,13 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const UsersRepository = require('../repositories/UsersRepository');
 const { validaCPF } = require('./Validators');
 
-
 class UsersController {
-  
   async index(request, response) {
     const { email, password } = request.body;
     try {
       const user = await UsersRepository.signIn(email, password);
       const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
-        expiresIn: '1h',
+        expiresIn: '8h',
       });
       if (user) {
         return response.status(200).json({ token, user });
@@ -31,14 +29,10 @@ class UsersController {
   async createUser(request, response) {
     const { name, cpf, email, password } = request.body;
     const createdAt = new Date();
-    console.log("Iniciando updateUser");
 
     if (!validaCPF(cpf)) {
-        console.log("CPF inválido. Interrompendo...");
-        return response.status(400).send({ message: 'CPF inválido.' });
+      return response.status(400).send({ message: 'CPF inválido.' });
     }
-    
-    console.log("CPF válido. Continuando...");
     try {
       await UsersRepository.createUser(name, cpf, email, password, createdAt);
       return response.status(200).json(name);
@@ -79,10 +73,6 @@ class UsersController {
 
   async updateUser(request, response) {
     const { USUARIO, CPF, EMAIL, ATIVO, TELEFONE } = request.body;
-    
-
-    
-
     try {
       await UsersRepository.updateUser(USUARIO, CPF, EMAIL, ATIVO);
       return response.status(200).json();
@@ -92,7 +82,6 @@ class UsersController {
       });
     }
   }
-
 }
 
 module.exports = new UsersController();
