@@ -1,103 +1,4 @@
 const pool = require('../../database/index');
-
-// const format ={
-//   IdentificacaoCandidato: {
-//     NomeCompleto: string;
-//     Cpf: string;
-//     DocIdentidade: string;
-//     DataNascimento: Date | null;
-//     Naturalidade: string;
-//     IdRacaEtnia: number;
-//     IdSitTrabalhista: number;
-//     OutraSitTrabalhista?: string;
-//     IdEstadoCivil: number;
-//     Email: string;
-//     NecessidadeEspecial: number;
-//     EnderecoResidencial: string;
-//     Numero: string;
-//     Complemento: string;
-//     Bairro: string;
-//     Cep: string;
-//     TelefoneResidencial: string;
-//     TelefoneRecado: string;
-//     TelefoneCelular: string;
-//     NomePai: string;
-//     CpfPai: string;
-//     NomeMae: string;
-//     CpfMae: string;
-//     NomeResponsavel: string;
-//     IdParentescoResponsavel: number;
-//     IdEstadoCivilPai: number;
-//     IdEstadoCivilMae: number;
-//   };
-//   OutrasFichasGrupoFamiliar: {};
-//   DadosEducacionaisCandidato: {
-//     Estuda: string;
-//     InstituicaoEnsino: string;
-//     NomeInstituicaoEnsino: string;
-//     EnderecoInstituicao: string;
-//     BairroInstituicao: string;
-//     SerieAtual: number;
-//     Turma: string;
-//     Turno: string;
-//     IdEscolaridade: number;
-//     OutrosCursosRealizados: string;
-//   };
-//   BeneficiosPleiteados: {};
-//   CondicoesSaudeCandidato: {
-//     NomeContatoEmergencia: string;
-//     TelefoneEmergencia1: string;
-//     TelefoneEmergencia2: string;
-//     Alergia: string;
-//     SitMedicaEspecial: string;
-//     FraturasCirurgicas: string;
-//     MedicacaoControlada: string;
-//     ProvidenciaRecomendada: string;
-//   };
-//   CondicoesSociaisESaudeFamilia: {
-//     FamiliarTratamentoMedico: string;
-//     FamiliarUsoMedico: string;
-//     FamiliarDeficiencia: string;
-//     FamiliarDependenciaQuimica: string;
-//     AcompanhamentoTerapeutico: string;
-//     ProgramaSocial: string;
-//   };
-//   CondicoesMoradia: {
-//     AguaPotavel: string;
-//     RedeEsgoto: string;
-//     IdCoberturaMoradia: number;
-//     RuaPavimentada: string;
-//     PossuiEletricidade: string;
-//     ComodosMoradia: number;
-//     TipoImovelResidencia: string;
-//     ValorAluguel: number;
-//     IdParentescoProprietario: number;
-//     PrestacaoFinanciamento: number;
-//   };
-//   ComposicaoFamiliar: {};
-//   Despesas: {
-//     DespesasDescontos: number;
-//     DespesasRendaBruta: number;
-//     DespesasMoradia: number;
-//     DespesasRendaLiquida: number;
-//     DespoesasEducacao: number;
-//     DespesasPessoasResidencia: number;
-//     DespesasSaude: number;
-//     DespesasRpc: number;
-//     DespesasTotal: number;
-//     DespesasObs: Blob;
-//   };
-//   OutrosGastos: Blob;
-//   SituacaoSocioEconomicaFamiliar: Blob;
-//   ObservacoesNecessarias: Blob;
-//   ParecerAssistSocial: {
-//     ParecerAssistSocial: Blob;
-//     StatusProcesso: string;
-//   };
-//   DataCad: Date;
-//   IdUsuario: number;
-// }
-// }
 class FichaCandidatoRepository {
   async createFichaCandidato(fichaCandidato) {
     /// VERIFICA SE O CPF JA ESTA CADASTRADO
@@ -117,7 +18,7 @@ class FichaCandidatoRepository {
           fichaCandidato.NOMECOMPLETO,
           fichaCandidato.CPF,
           fichaCandidato.DOCIDENTIDADE,
-          fichaCandidato.DATANASCIMENTO,
+          new Date(fichaCandidato.DATANASCIMENTO),
           fichaCandidato.NATURALIDADE,
           fichaCandidato.IDRACAETNIA,
           fichaCandidato.IDSITTRABALHISTA,
