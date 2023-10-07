@@ -18,5 +18,8 @@
     "mysql2": "^3.2.4",
     "nodemon": "^2.0.22",
     "pg": "^8.10.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.4.1"
   }
 }

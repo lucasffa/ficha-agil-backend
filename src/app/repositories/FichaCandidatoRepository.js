@@ -1,14 +1,18 @@
 const pool = require('../../database/index');
 class FichaCandidatoRepository {
   async createFichaCandidato(fichaCandidato) {
+    //Verifica se o cpf está correto
     /// VERIFICA SE O CPF JA ESTA CADASTRADO
     const [row] = await pool.query('SELECT CPF FROM FICHA WHERE CPF = ? ', [
       fichaCandidato.CPF,
     ]);
     if (row?.CPF === fichaCandidato.CPF) {
       throw new Error(
-        `Já existe um Usuário com esse CPF(${fichaCandidato.CPF}) cadastrado no banco de dados.`
+        `Já existe um candidato com esse CPF(${fichaCandidato.CPF}) cadastrado no banco de dados.`
       );
+    }
+    if (fichaCandidato.DATANASCIMENTO === '') {
+      throw new Error(`A Data de nascimento não pode ser vazia.`);
     }
 
     try {
@@ -18,7 +22,7 @@ class FichaCandidatoRepository {
           fichaCandidato.NOMECOMPLETO,
           fichaCandidato.CPF,
           fichaCandidato.DOCIDENTIDADE,
-          new Date(fichaCandidato.DATANASCIMENTO),
+          fichaCandidato.DATANASCIMENTO,
           fichaCandidato.NATURALIDADE,
           fichaCandidato.IDRACAETNIA,
           fichaCandidato.IDSITTRABALHISTA,
