@@ -38,7 +38,7 @@ class UsersRepository {
       );
 
       const rows = await pool.query(`
-      SELECT IDUSUARIO, USUARIO, EMAIL, CPF
+      SELECT IDUSUARIO, USUARIO, EMAIL, CPF, ATIVO
       FROM USUARIO
       WHERE ATIVO = "${ATIVO}"
       ORDER BY USUARIO ASC

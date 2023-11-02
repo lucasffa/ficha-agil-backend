@@ -249,13 +249,29 @@ class FichaCandidatoController {
     try {
       const page = parseInt(request.query.page) || 1;
       const limit = parseInt(request.query.take) || 5;
-      //const ativo = request.query.ativo;
+      const ativo = request.query.ativo;
       const offset = (page - 1) * limit;
-      const fichas = await FichaCandidatoRepository.getFichas(limit, offset);
+      const fichas = await FichaCandidatoRepository.getFichas(
+        limit,
+        offset,
+        ativo
+      );
       return response.status(200).json({
         fichasCandidatos: fichas.fichasCandidatos,
         totalDefichasCandidatos: fichas.totalDefichasCandidatos,
       });
+    } catch (err) {
+      return response.status(401).json({
+        message: err.message,
+      });
+    }
+  }
+
+  async getFichaById(request, response) {
+    try {
+      const idFicha = request.query.idFicha;
+      const ficha = await FichaCandidatoRepository.getFichaById(idFicha);
+      return response.status(200).json(...ficha);
     } catch (err) {
       return response.status(401).json({
         message: err.message,

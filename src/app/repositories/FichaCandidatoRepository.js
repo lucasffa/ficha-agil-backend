@@ -99,27 +99,8 @@ class FichaCandidatoRepository {
           fichaCandidato.IDUSUARIO,
         ]
       );
-      console.log(rows);
+
       return rows;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async getFichaCandidatos(limit, offset) {
-    try {
-      const totalPage = await pool.query(`SELECT IDFICHA FROM FICHA`);
-
-      const rows = await pool.query(`
-      SELECT NOMECOMPLETO, CPF, DATANASCIMENTO
-      FROM FICHA
-      ORDER BY NOMECOMPLETO ASC
-      LIMIT ${limit} OFFSET ${offset} 
-      `);
-      return {
-        users: rows,
-        totalDeCandidatos: totalPage?.length,
-      };
     } catch (error) {
       throw error;
     }
@@ -191,24 +172,15 @@ class FichaCandidatoRepository {
     }
   }
 
-  async getFichas() {
+  async getFichas(limit, offset, ATIVO) {
     try {
-      const rows = await pool.query(`
-      SELECT * FROM FICHA;	
-      `);
-      return rows;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async getFichas(limit, offset) {
-    try {
-      const totalPage = await pool.query(`SELECT IDFICHA FROM FICHA`);
+      const totalPage = await pool.query(
+        `SELECT IDFICHA FROM FICHA WHERE ATIVO = "${ATIVO}" AND EXCLUIDO = "N"`
+      );
 
       const rows = await pool.query(`
-      SELECT IDFICHA, NOMECOMPLETO, EMAIL, CPF
-      FROM FICHA
+      SELECT IDFICHA, NOMECOMPLETO, EMAIL, CPF, ATIVO
+      FROM FICHA WHERE ATIVO = "${ATIVO}" AND EXCLUIDO = "N"
       ORDER BY NOMECOMPLETO ASC
       LIMIT ${limit} OFFSET ${offset} 
       `);
@@ -216,6 +188,17 @@ class FichaCandidatoRepository {
         fichasCandidatos: rows,
         totalDefichasCandidatos: totalPage?.length,
       };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getFichaById(id) {
+    try {
+      const rows = await pool.query(`
+      SELECT * FROM FICHA WHERE IDFICHA = ${id} AND EXCLUIDO = "N"
+      `);
+      return rows;
     } catch (error) {
       throw error;
     }

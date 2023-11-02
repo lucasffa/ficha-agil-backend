@@ -49,5 +49,6 @@ router.get(
   FichaCandidatoController.getParentesco
 );
 router.get('/fichas', authenticateToken, FichaCandidatoController.getFichas);
+router.get('/ficha', authenticateToken, FichaCandidatoController.getFichaById);
 
 module.exports = router;
