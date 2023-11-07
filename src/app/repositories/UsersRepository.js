@@ -1,12 +1,18 @@
 const pool = require('../../database/index');
 
 class UsersRepository {
-  async signIn(email, password) {
+  async signIn(email, password, response) {
     const [rows] = await pool.query(
-      'SELECT USUARIO FROM USUARIO WHERE EMAIL = ? AND SENHA = ?',
+      'SELECT USUARIO, ATIVO, IDUSUARIO FROM USUARIO WHERE EMAIL = ? AND SENHA = ?',
       [email, password]
     );
-    return rows;
+    if (rows.ATIVO === 'N') {
+      return response
+        .status(401)
+        .json({ message: 'Usuário inativo, entre em contato com o suporte' });
+    } else {
+      return rows;
+    }
   }
 
   async createUser(name, cpf, email, password, createdAt) {
@@ -65,12 +71,21 @@ class UsersRepository {
     }
   }
 
-  async updateUser(USUARIO, CPF, EMAIL, ATIVO) {
+  async updateUser(USUARIO, CPF, EMAIL, ATIVO, IDUSUARIOREQ, response) {
     try {
-      await pool.query(
+      const rows = await pool.query(
         'UPDATE USUARIO SET EMAIL = ?, CPF = ?, ATIVO = ?, USUARIO = ? WHERE CPF = ?',
         [EMAIL, CPF, ATIVO, USUARIO, CPF]
       );
+      if (rows.affectedRows > 0) {
+        const [usuario] = await pool.query(
+          'SELECT IDUSUARIO FROM USUARIO WHERE CPF = ?',
+          [CPF]
+        );
+        if (usuario.IDUSUARIO === Number(IDUSUARIOREQ)) {
+          console.log('ok');
+        }
+      }
     } catch (error) {
       throw error;
     }

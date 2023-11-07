@@ -100,6 +100,27 @@ class FichaCandidatoRepository {
         ]
       );
 
+      const idFicha =
+        rows.affectedRows > 0
+          ? await pool.query('SELECT IDFICHA FROM FICHA WHERE CPF = ? ', [
+              fichaCandidato.CPF,
+            ])
+          : null;
+
+      const insertBeneficios =
+        rows.affectedRows > 0 && idFicha !== undefined
+          ? await pool.query(
+              'INSERT INTO BENEFICIOS (IDFICHA, PRIORIDADE, ATIVIDADECURSO, TURNO, HORARIO) VALUES (?, ?, ?, ?, ?)',
+              [
+                idFicha.IDFICHA,
+                fichaCandidato.PRIORIDADE,
+                fichaCandidato.PRIORIDADE,
+                fichaCandidato.ATIVIDADECURSO,
+                fichaCandidato.ATIVIDADECURSO,
+              ]
+            )
+          : null;
+      console.log(insertBeneficios);
       return rows;
     } catch (error) {
       throw error;

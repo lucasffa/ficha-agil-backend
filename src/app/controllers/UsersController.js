@@ -7,10 +7,11 @@ class UsersController {
   async index(request, response) {
     const { email, password } = request.body;
     try {
-      const user = await UsersRepository.signIn(email, password);
+      const user = await UsersRepository.signIn(email, password, response);
       const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
         expiresIn: '8h',
       });
+
       if (user) {
         return response.status(200).json({ token, user });
       }
@@ -72,9 +73,17 @@ class UsersController {
   }
 
   async updateUser(request, response) {
-    const { USUARIO, CPF, EMAIL, ATIVO, TELEFONE } = request.body;
+    const { USUARIO, CPF, EMAIL, ATIVO, IDUSUARIOREQ } = request.body;
+
     try {
-      await UsersRepository.updateUser(USUARIO, CPF, EMAIL, ATIVO);
+      await UsersRepository.updateUser(
+        USUARIO,
+        CPF,
+        EMAIL,
+        ATIVO,
+        IDUSUARIOREQ,
+        response
+      );
       return response.status(200).json();
     } catch (err) {
       return response.status(401).json({
