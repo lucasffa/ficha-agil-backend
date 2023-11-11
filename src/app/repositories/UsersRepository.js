@@ -1,18 +1,21 @@
 const pool = require('../../database/index');
 
 class UsersRepository {
-  async signIn(email, password, response) {
+  async signIn(email, password) {
     const [rows] = await pool.query(
       'SELECT USUARIO, ATIVO, IDUSUARIO FROM USUARIO WHERE EMAIL = ? AND SENHA = ?',
       [email, password]
     );
-    if (rows.ATIVO === 'N') {
-      return response
-        .status(401)
-        .json({ message: 'Usuário inativo, entre em contato com o suporte' });
-    } else {
-      return rows;
+    if (rows.length === 0) {
+      return null;
     }
+
+    const user = rows;
+    if (user.ATIVO === 'N') {
+      return null;
+    }
+
+    return user;
   }
 
   async createUser(name, cpf, email, password, createdAt) {
@@ -83,7 +86,6 @@ class UsersRepository {
           [CPF]
         );
         if (usuario.IDUSUARIO === Number(IDUSUARIOREQ)) {
-          console.log('ok');
         }
       }
     } catch (error) {
