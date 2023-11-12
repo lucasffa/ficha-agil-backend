@@ -1,22 +1,25 @@
-const pool = require("../../database/index");
+const pool = require('../../database/index');
 class FichaCandidatoRepository {
   async createFichaCandidato(fichaCandidato) {
     //Verifica se o cpf está correto
     /// VERIFICA SE O CPF JA ESTA CADASTRADO
-    const [row] = await pool.query("SELECT CPF FROM FICHA WHERE CPF = ? ", [
+    const [row] = await pool.query('SELECT CPF FROM FICHA WHERE CPF = ? ', [
       fichaCandidato.CPF,
     ]);
+
     if (row?.CPF === fichaCandidato.CPF) {
       throw new Error(
         `Já existe um candidato com esse CPF(${fichaCandidato.CPF}) cadastrado no banco de dados.`
       );
     }
-    if (fichaCandidato.DATANASCIMENTO === "") {
+
+    if (fichaCandidato.DATANASCIMENTO === '') {
       throw new Error(`A Data de nascimento não pode ser vazia.`);
     }
+
     try {
       const rows = await pool.query(
-        "INSERT INTO FICHA (NOMECOMPLETO, CPF, DOCIDENTIDADE, DATANASCIMENTO, NATURALIDADE, IDRACAETNIA, IDSITTRABALHISTA, OUTRASITTRABALHISTA, IDESTADOCIVIL, EMAIL, NECESSIDADEESPECIAL, ENDERECORESIDENCIAL, NUMERO, COMPLEMENTO, BAIRRO, CEP, TELEFONERESIDENCIAL, TELEFONERECADO, TELEFONECELULAR, NOMEPAI, CPFPAI, NOMEMAE, CPFMAE, NOMERESPONSAVEL, IDPARENTESCORESPONSAVEL, IDESTADOCIVILPAI, IDESTADOCIVILMAE, ESTUDA, INSTITUICAOENSINO, NOMEINSTITUICAO, ENDERECOINSTITUICAO, BAIRROINSTITUICAO, SERIEATUAL, TURMA, TURNO, IDESCOLARIDADE, OUTROSCURSOSREALIZADOS, NOMECONTATOEMERGENCIA, TELEFONEEMERGENCIA1, TELEFONEEMERGENCIA2, ALERGIA, SITMEDICAESPECIAL, FRATURASCIRURGIAS, MEDICACAOCONTROLADA, PROVIDENCIARECOMENDADA, FAMILIARTRATAMENTOMEDICO, FAMILIARUSOMEDICAMENTO, FAMILIARDEFICIENCIA, FAMILIARDEPENDENCIAQUIMICA, ACOMPTERAPEUTICO, PROGRAMASOCIAL, AGUAPOTAVEL, REDEESGOTO, IDCOBERTURAMORADIA, RUAPAVIMENTADA, POSSUIELETRICIDADE, COMODOSMORADIA, TIPOIMOVELRESIDENCIA, VALORALUGUEL, IDPARENTESCOPROPRIETARIO, PRESTACAOFINANCIAMENTO, DESPESASDESCONTOS, DESPESASRENDABRUTA, DESPESASMORADIA, DESPESASRENDALIQUIDA, DESPESASEDUCACAO, DESPESASPESSOASRESIDENCIA, DESPESASSAUDE, DESPESASRPC, DESPESASTOTAL, DESPESASOBS, OUTROSGASTOS, SITSOCIOECONOMICOFAMILIAR, OBSERVACOESNECESSARIAS, PARECERASSISTSOCIAL, STATUSPROCESSO, DATACAD, IDUSUARIO) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        'INSERT INTO FICHA (NOMECOMPLETO, CPF, DOCIDENTIDADE, DATANASCIMENTO, NATURALIDADE, IDRACAETNIA, IDSITTRABALHISTA, OUTRASITTRABALHISTA, IDESTADOCIVIL, EMAIL, NECESSIDADEESPECIAL, ENDERECORESIDENCIAL, NUMERO, COMPLEMENTO, BAIRRO, CEP, TELEFONERESIDENCIAL, TELEFONERECADO, TELEFONECELULAR, NOMEPAI, CPFPAI, NOMEMAE, CPFMAE, NOMERESPONSAVEL, IDPARENTESCORESPONSAVEL, IDESTADOCIVILPAI, IDESTADOCIVILMAE, ESTUDA, INSTITUICAOENSINO, NOMEINSTITUICAO, ENDERECOINSTITUICAO, BAIRROINSTITUICAO, SERIEATUAL, TURMA, TURNO, IDESCOLARIDADE, OUTROSCURSOSREALIZADOS, NOMECONTATOEMERGENCIA, TELEFONEEMERGENCIA1, TELEFONEEMERGENCIA2, ALERGIA, SITMEDICAESPECIAL, FRATURASCIRURGIAS, MEDICACAOCONTROLADA, PROVIDENCIARECOMENDADA, FAMILIARTRATAMENTOMEDICO, FAMILIARUSOMEDICAMENTO, FAMILIARDEFICIENCIA, FAMILIARDEPENDENCIAQUIMICA, ACOMPTERAPEUTICO, PROGRAMASOCIAL, AGUAPOTAVEL, REDEESGOTO, IDCOBERTURAMORADIA, RUAPAVIMENTADA, POSSUIELETRICIDADE, COMODOSMORADIA, TIPOIMOVELRESIDENCIA, VALORALUGUEL, IDPARENTESCOPROPRIETARIO, PRESTACAOFINANCIAMENTO, DESPESASDESCONTOS, DESPESASRENDABRUTA, DESPESASMORADIA, DESPESASRENDALIQUIDA, DESPESASEDUCACAO, DESPESASPESSOASRESIDENCIA, DESPESASSAUDE, DESPESASRPC, DESPESASTOTAL, DESPESASOBS, OUTROSGASTOS, SITSOCIOECONOMICOFAMILIAR, OBSERVACOESNECESSARIAS, PARECERASSISTSOCIAL, STATUSPROCESSO, DATACAD, IDUSUARIO) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
         [
           fichaCandidato.NOMECOMPLETO,
           fichaCandidato.CPF,
@@ -101,26 +104,63 @@ class FichaCandidatoRepository {
 
       const idFicha =
         rows.affectedRows > 0
-          ? await pool.query("SELECT IDFICHA FROM FICHA WHERE CPF = ? ", [
-              fichaCandidato.CPF,
-            ])
-          : null;
-
-      const insertBeneficios =
-        rows.affectedRows > 0 && idFicha !== undefined
           ? await pool.query(
-              "INSERT INTO BENEFICIOS (IDFICHA, PRIORIDADE, ATIVIDADECURSO, TURNO, HORARIO) VALUES (?, ?, ?, ?, ?)",
-              [
-                idFicha.IDFICHA,
-                fichaCandidato.PRIORIDADE,
-                fichaCandidato.PRIORIDADE,
-                fichaCandidato.ATIVIDADECURSO,
-                fichaCandidato.ATIVIDADECURSO,
-              ]
+              'SELECT IDFICHA FROM FICHA WHERE CPF = ? AND DOCIDENTIDADE = ?',
+              [fichaCandidato.CPF, fichaCandidato.DOCIDENTIDADE]
             )
           : null;
-          
-      console.log(insertBeneficios);
+
+      //Insert nas tabelas que possuem relacionamento com a ficha
+      if (rows.affectedRows > 0 && idFicha !== null) {
+        try {
+          fichaCandidato.BENEFICIOSPLEITEADOS.forEach(async element => {
+            const insertBeneficios = await pool.query(
+              'INSERT INTO BENEFICIOS (IDFICHA, PRIORIDADE, ATIVIDADECURSO, TURNO, HORARIO) VALUES (?, ?, ?, ?, ?)',
+              [
+                idFicha[0].IDFICHA,
+                null,
+                element.NomeCursoPretendido,
+                element.Turno,
+                element.Horario,
+              ]
+            );
+            return insertBeneficios;
+          });
+
+          fichaCandidato.GRUPOFAMILIAR.forEach(async element => {
+            const insertGrupoFamiliar = await pool.query(
+              'INSERT INTO GRUPOFAMILIAR (IDFICHAPRINCIPAL, IDFICHAFAMILIAR, IDPARENTESCO) VALUES (?, ?, ?)',
+              [
+                idFicha[0].IDFICHA,
+                element.IdFichaFamiliar,
+                element.IdParentesco,
+              ]
+            );
+            return insertGrupoFamiliar;
+          });
+
+          fichaCandidato.COMPFAMILIAR.forEach(async element => {
+            const insertCompFamiliar = await pool.query(
+              'INSERT INTO COMPFAMILIAR (IDFICHA, NOME, IDPARENTESCO, IDADE, IDESTADOCIVIL, PROFISSAO, IDSITTRABALHISTA, IDESCOLARIDADE, RENDA) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+              [
+                idFicha[0].IDFICHA,
+                element.Nome,
+                element.IdParentesco,
+                element.Idade,
+                element.IdEstadoCivil,
+                element.Profissao,
+                element.IdSitTrabalhista,
+                element.IdEscolaridade,
+                element.Renda,
+              ]
+            );
+            return insertCompFamiliar;
+          });
+        } catch (error) {
+          throw new Error(error);
+        }
+      }
+
       return rows;
     } catch (error) {
       throw error;
