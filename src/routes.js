@@ -5,6 +5,7 @@ const FichaCandidatoController = require('./app/controllers/FichaCandidatoContro
 const router = Router();
 const authenticateToken = require('./app/middlewares/authenticateToken');
 
+
 //login and users' routes
 router.post('/login', UsersController.index);
 router.post('/createUser', authenticateToken, UsersController.createUser);
@@ -51,7 +52,7 @@ router.get(
 router.get('/fichas', authenticateToken, FichaCandidatoController.getFichas);
 router.get('/ficha', authenticateToken, FichaCandidatoController.getFichaById);
 
-router.put('/updateFicha', FichaCandidatoController.updateFichaCandidato);
+router.put(`/updateFicha/:IDFICHA`, authenticateToken, FichaCandidatoController.updateFichaCandidato);
 
 
 module.exports = router;
