@@ -120,25 +120,17 @@ class FichaCandidatoController {
   async updateFichaCandidato(request, response) {
     try {
       const fichaCandidato = request.body;
-      const IDFICHA = request.params.IDFICHA;
-  
-      fichaCandidato.IDFICHA = IDFICHA;
-  
-      await FichaCandidatoRepository.updateFichaCandidato(fichaCandidato, IDFICHA);
-  
-  
+
+      await FichaCandidatoRepository.updateFichaCandidato(fichaCandidato);
+
       return response.status(200).json({
-        message: 'atualizada', 
-        IDFICHA: IDFICHA
+        message: 'Ficha do candidato atualizada com sucesso',
       });
-  
     } catch (err) {
       return response.status(401).json({
         message: err.message,
       });
     }
   }
-  
-  
 }
 module.exports = new FichaCandidatoController();

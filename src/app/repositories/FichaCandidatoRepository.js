@@ -265,7 +265,7 @@ class FichaCandidatoRepository {
     }
   }
 
-  async updateFichaCandidato(fichaCandidato, IDFICHA) {
+  async updateFichaCandidato(fichaCandidato) {
     try {
       const updateFicha = await pool.query(
         `UPDATE FICHA SET
@@ -425,18 +425,67 @@ class FichaCandidatoRepository {
           fichaCandidato.OBSERVACOESNECESSARIAS,
           fichaCandidato.PARECERASSISTSOCIAL,
           fichaCandidato.STATUSPROCESSO,
-          new Date(),
+          new Date(fichaCandidato.DATACAD),
           fichaCandidato.IDUSUARIO,
-          IDFICHA
+          fichaCandidato.IDFICHA,
         ]
       );
 
+      //update nas tabelas que possuem relacionamento com a ficha
+      if (updateFicha.affectedRows > 0 && fichaCandidato.IDFICHA !== null) {
+        try {
+          fichaCandidato.BENEFICIOSPLEITEADOS.forEach(async element => {
+            const insertBeneficios = await pool.query(
+              'UPDATE BENEFICIOS SET PRIORIDADE = ? , ATIVIDADECURSO = ?, TURNO = ?, HORARIO = ? WHERE IDFICHA = ?',
+              [
+                null,
+                element.NomeCursoPretendido,
+                element.Turno,
+                element.Horario,
+                fichaCandidato.IDFICHA,
+              ]
+            );
+            return insertBeneficios;
+          });
+
+          fichaCandidato.GRUPOFAMILIAR.forEach(async element => {
+            const insertGrupoFamiliar = await pool.query(
+              'UPDATE GRUPOFAMILIAR SET IDFICHAFAMILIAR = ?, IDPARENTESCO = ? WHERE IDFICHAPRINCIPAL = ?',
+              [
+                element.IdFichaFamiliar,
+                element.IdParentesco,
+                fichaCandidato.IDFICHA,
+              ]
+            );
+            return insertGrupoFamiliar;
+          });
+
+          fichaCandidato.COMPFAMILIAR.forEach(async element => {
+            const insertCompFamiliar = await pool.query(
+              'UPDATE COMPFAMILIAR SET NOME = ?, IDPARENTESCO = ?, IDADE = ?, IDESTADOCIVIL = ?, PROFISSAO = ?, IDSITTRABALHISTA = ?, IDESCOLARIDADE = ?, RENDA = ? WHERE IDFICHA = ?',
+              [
+                element.Nome,
+                element.IdParentesco,
+                element.Idade,
+                element.IdEstadoCivil,
+                element.Profissao,
+                element.IdSitTrabalhista,
+                element.IdEscolaridade,
+                element.Renda,
+                fichaCandidato.IDFICHA,
+              ]
+            );
+            return insertCompFamiliar;
+          });
+        } catch (error) {
+          throw new Error(error);
+        }
+      }
+
       return updateFicha;
-      
     } catch (error) {
       throw error;
     }
   }
-  
 }
 module.exports = new FichaCandidatoRepository();
