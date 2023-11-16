@@ -1,9 +1,17 @@
 const express = require('express');
+const { clearExpiredTokens } = require('./app/utils/blacklist');
 require('express-async-errors');
 require('dotenv').config();
 
 const routes = require('./routes');
 const cors = require('cors');
+
+// Agenda a limpeza da blacklist a cada 5 minutos
+setInterval(() => {
+  clearExpiredTokens();
+}, 5 * 60 * 1000
+);
+
 
 const app = express();
 
