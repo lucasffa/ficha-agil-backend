@@ -109,7 +109,7 @@ class FichaCandidatoController {
     try {
       const idFicha = request.query.idFicha;
       const ficha = await FichaCandidatoRepository.getFichaById(idFicha);
-      return response.status(200).json(...ficha);
+      return response.status(200).json(ficha);
     } catch (err) {
       return response.status(401).json({
         message: err.message,
