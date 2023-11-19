@@ -3,10 +3,11 @@ const { Router } = require('express');
 const UsersController = require('./app/controllers/UsersController');
 const FichaCandidatoController = require('./app/controllers/FichaCandidatoController');
 const router = Router();
-const authenticateToken = require('./app/middlewares/authenticateToken');
+const authenticateToken = require('./app/middlewares/AuthenticateToken');
 
 //login and users' routes
 router.post('/login', UsersController.index);
+router.post('/logout', authenticateToken, UsersController.logout);
 router.post('/createUser', authenticateToken, UsersController.createUser);
 router.get('/users', authenticateToken, UsersController.getUsers);
 router.get('/user', authenticateToken, UsersController.getUser);
