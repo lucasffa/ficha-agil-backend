@@ -58,4 +58,9 @@ router.put(
   FichaCandidatoController.updateFichaCandidato
 );
 
+router.delete(
+  '/deleteFicha',
+  authenticateToken,
+  FichaCandidatoController.deleteFichaCandidato
+);
 module.exports = router;

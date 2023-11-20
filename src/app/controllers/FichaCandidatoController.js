@@ -132,5 +132,20 @@ class FichaCandidatoController {
       });
     }
   }
+
+  async deleteFichaCandidato(request, response) {
+    try {
+      const idFicha = request.query.idFicha;
+      await FichaCandidatoRepository.deleteFichaCandidato(idFicha);
+
+      return response.status(200).json({
+        message: 'Ficha do candidato deletada com sucesso',
+      });
+    } catch (err) {
+      return response.status(401).json({
+        message: err.message,
+      });
+    }
+  }
 }
 module.exports = new FichaCandidatoController();

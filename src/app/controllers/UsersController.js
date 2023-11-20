@@ -3,36 +3,38 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const UsersRepository = require('../repositories/UsersRepository');
 const { validaCPF } = require('./Validators');
 const { addToBlacklist } = require('../utils/blacklist');
-const NodeCache = require("node-cache");
+const NodeCache = require('node-cache');
 const userCache = new NodeCache({ stdTTL: 600 });
 const usersCache = new NodeCache({ stdTTL: 600 });
-
 
 class UsersController {
   async index(request, response) {
     const { email, password } = request.body;
     try {
       const user = await UsersRepository.signIn(email, password);
-  
+
       if (!user) {
         return response.status(401).json({
-          message: 'Usuário não encontrado ou inativo'
+          message: 'Usuário não encontrado ou inativo',
         });
       }
-  
+
       const token = jwt.sign({ userId: user.IDUSUARIO }, JWT_SECRET, {
-        expiresIn: '1h',
+        expiresIn: '8h',
       });
-  
+
       return response.status(200).json({ token, user });
     } catch (err) {
-      console.log("Erro: ", err);
-      return response.status(500).json({
-        message: 'Erro interno do servidor'
-      });
+      return response.status(401).json(
+        err.fatal === true
+          ? {
+              message:
+                'Erro de conexão com o banco de dados, entre em contato com o administrador',
+            }
+          : { message: 'Usuário não encontrado ou inativo' }
+      );
     }
   }
-
 
   async createUser(request, response) {
     const { name, cpf, email, password } = request.body;
@@ -43,7 +45,7 @@ class UsersController {
     }
     try {
       await UsersRepository.createUser(name, cpf, email, password, createdAt);
-      
+
       // Limpar o cache universal
       usersCache.flushAll();
 
@@ -55,7 +57,6 @@ class UsersController {
     }
   }
 
-  
   async getUsers(request, response) {
     try {
       const page = parseInt(request.query.page) || 1;
@@ -71,7 +72,10 @@ class UsersController {
 
       if (!cachedData) {
         const users = await UsersRepository.getUsers(limit, offset, ativo);
-        cachedData = { users: users.users, totalDeUsuarios: users.totalDeUsuarios };
+        cachedData = {
+          users: users.users,
+          totalDeUsuarios: users.totalDeUsuarios,
+        };
 
         // Armazenar no cache
         usersCache.set(cacheKey, cachedData);
@@ -89,12 +93,12 @@ class UsersController {
     try {
       const userId = request.query.IDUSUARIO;
       let user = userCache.get(userId);
-  
+
       if (!user) {
         user = await UsersRepository.getUser(userId);
         userCache.set(userId, user);
       }
-  
+
       return response.status(200).json(...user);
     } catch (err) {
       return response.status(401).json({
@@ -102,7 +106,6 @@ class UsersController {
       });
     }
   }
-  
 
   async updateUser(request, response) {
     const { USUARIO, CPF, EMAIL, ATIVO, IDUSUARIOREQ } = request.body;
@@ -133,21 +136,22 @@ class UsersController {
 
   async logout(req, res) {
     try {
-        const authHeader = req.headers['authorization'];
-        const token = authHeader && authHeader.split(' ')[1];
+      const authHeader = req.headers['authorization'];
+      const token = authHeader && authHeader.split(' ')[1];
 
-        if (!token) {
-            return res.status(401).json({ message: 'Nenhum token disponibilizado' });
-        }
+      if (!token) {
+        return res.status(401).json({ message: 'Nenhum token disponível' });
+      }
 
-        addToBlacklist(token);
-        res.status(200).json({ message: 'Fez logout com sucesso' });
+      addToBlacklist(token);
+      res
+        .status(200)
+        .json({ message: 'Desconectado(a) do sistema com sucesso' });
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: 'Houve erro ao fazer logout' });
+      console.log(error);
+      res.status(500).json({ message: 'Erro ao sair do sistema' });
     }
   }
-
 }
 
 module.exports = new UsersController();

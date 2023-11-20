@@ -2,20 +2,15 @@ const pool = require('../../database/index');
 
 class UsersRepository {
   async signIn(email, password) {
-    const [rows] = await pool.query(
-      'SELECT USUARIO, ATIVO, IDUSUARIO FROM USUARIO WHERE EMAIL = ? AND SENHA = ?',
-      [email, password]
-    );
-    if (rows.length === 0) {
-      return null;
+    try {
+      const [rows] = await pool.query(
+        'SELECT USUARIO, ATIVO, IDUSUARIO FROM USUARIO WHERE EMAIL = ? AND SENHA = ?',
+        [email, password]
+      );
+      return rows;
+    } catch (error) {
+      throw error;
     }
-
-    const user = rows;
-    if (user.ATIVO === 'N') {
-      return null;
-    }
-
-    return user;
   }
 
   async createUser(name, cpf, email, password, createdAt) {
