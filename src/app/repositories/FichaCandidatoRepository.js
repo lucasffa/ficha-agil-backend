@@ -508,20 +508,20 @@ class FichaCandidatoRepository {
               }
             })
           );
-          console.log(fichaCandidato.GRUPOFAMILIAR);
+
           await Promise.all(
             fichaCandidato.GRUPOFAMILIAR?.map(async element => {
               const grupoFamiliarExistente = await pool.query(
-                'SELECT * FROM GRUPOFAMILIAR WHERE IDFICHAPRINCIPAL = ? AND IDFICHAFAMILIAR = ?',
-                [fichaCandidato.IDFICHA, element.IdFichaFamiliar]
+                'SELECT * FROM GRUPOFAMILIAR WHERE IDGRUPOFAMILIAR = ?',
+                [element.IdGrupoFamiliar]
               );
               if (grupoFamiliarExistente.length > 0) {
                 const insertGrupoFamiliar = await pool.query(
-                  'UPDATE GRUPOFAMILIAR SET IDFICHAFAMILIAR = ?, IDPARENTESCO = ? WHERE IDFICHAPRINCIPAL = ?',
+                  'UPDATE GRUPOFAMILIAR SET IDFICHAFAMILIAR = ?, IDPARENTESCO = ? WHERE IDGRUPOFAMILIAR = ?',
                   [
                     element.IdFichaFamiliar,
                     element.IdParentesco,
-                    fichaCandidato.IDFICHA,
+                    element.IdGrupoFamiliar,
                   ]
                 );
                 return insertGrupoFamiliar;
@@ -544,7 +544,7 @@ class FichaCandidatoRepository {
                 'SELECT * FROM COMPFAMILIAR WHERE IDFICHA = ? AND IDCOMPFAMILIAR = ?',
                 [fichaCandidato.IDFICHA, element.IdCompFamiliar]
               );
-              console.log(compFamiliarExistente);
+
               if (compFamiliarExistente.length > 0) {
                 const insertCompFamiliar = await pool.query(
                   'UPDATE COMPFAMILIAR SET NOME = ?, IDPARENTESCO = ?, IDADE = ?, IDESTADOCIVIL = ?, PROFISSAO = ?, IDSITTRABALHISTA = ?, IDESCOLARIDADE = ?, RENDA = ? WHERE IDFICHA = ? AND IDCOMPFAMILIAR = ?',
@@ -587,6 +587,18 @@ class FichaCandidatoRepository {
       }
 
       return updateFicha;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getFichaCandidatoFiltrado(nome, cpf) {
+    try {
+      const rows = await pool.query(`
+      SELECT IDFICHA, NOMECOMPLETO, EMAIL, CPF, ATIVO
+      FROM FICHA WHERE NOMECOMPLETO LIKE '%${nome}%' AND CPF LIKE '%${cpf}%'
+      ORDER BY NOMECOMPLETO ASC`);
+      return rows;
     } catch (error) {
       throw error;
     }

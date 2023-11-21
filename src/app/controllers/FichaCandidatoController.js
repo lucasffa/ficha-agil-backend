@@ -147,5 +147,18 @@ class FichaCandidatoController {
       });
     }
   }
+
+  async getFichaCandidatoFiltrado(request, response) {
+    try {
+      const nome = request.query.nome;
+      const cpf = request.query.cpf;
+      await FichaCandidatoRepository.getFichaCandidatoFiltrado(nome, cpf);
+      return response.status(200).json({});
+    } catch (err) {
+      return response.status(401).json({
+        message: err.message,
+      });
+    }
+  }
 }
 module.exports = new FichaCandidatoController();
