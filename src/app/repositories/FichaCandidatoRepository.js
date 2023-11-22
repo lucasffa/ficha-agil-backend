@@ -592,13 +592,22 @@ class FichaCandidatoRepository {
     }
   }
 
-  async getFichaCandidatoFiltrado(nome, cpf) {
+  async getFichaCandidatoFiltrado(nome, cpf, ativo, limit, offset) {
     try {
+      const totalPage = await pool.query(
+        `SELECT IDFICHA FROM FICHA WHERE NOMECOMPLETO LIKE '%${nome}%' AND CPF LIKE '%${cpf}%' AND ATIVO = "${ativo}" AND EXCLUIDO = "N"`
+      );
+
       const rows = await pool.query(`
       SELECT IDFICHA, NOMECOMPLETO, EMAIL, CPF, ATIVO
       FROM FICHA WHERE NOMECOMPLETO LIKE '%${nome}%' AND CPF LIKE '%${cpf}%'
-      ORDER BY NOMECOMPLETO ASC`);
-      return rows;
+      ORDER BY NOMECOMPLETO ASC
+      LIMIT ${limit} OFFSET ${offset}`);
+
+      return {
+        fichasCandidatos: rows,
+        totalDefichasCandidatos: totalPage?.length,
+      };
     } catch (error) {
       throw error;
     }

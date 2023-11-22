@@ -152,8 +152,22 @@ class FichaCandidatoController {
     try {
       const nome = request.query.nome;
       const cpf = request.query.cpf;
-      await FichaCandidatoRepository.getFichaCandidatoFiltrado(nome, cpf);
-      return response.status(200).json({});
+      const ativo = request.query.ativo;
+      const page = parseInt(request.query.page) || 1;
+      const limit = parseInt(request.query.take) || 5;
+      const offset = (page - 1) * limit;
+
+      const fichas = await FichaCandidatoRepository.getFichaCandidatoFiltrado(
+        nome,
+        cpf,
+        ativo,
+        limit,
+        offset
+      );
+      return response.status(200).json({
+        fichasCandidatos: fichas.fichasCandidatos,
+        totalDefichasCandidatos: fichas.totalDefichasCandidatos,
+      });
     } catch (err) {
       return response.status(401).json({
         message: err.message,

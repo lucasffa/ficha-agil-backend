@@ -63,4 +63,10 @@ router.delete(
   authenticateToken,
   FichaCandidatoController.deleteFichaCandidato
 );
+
+router.get(
+  '/fichaCandidatoFilter',
+  authenticateToken,
+  FichaCandidatoController.getFichaCandidatoFiltrado
+);
 module.exports = router;
