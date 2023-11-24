@@ -600,9 +600,11 @@ class FichaCandidatoRepository {
 
       const rows = await pool.query(`
       SELECT IDFICHA, NOMECOMPLETO, EMAIL, CPF, ATIVO
-      FROM FICHA WHERE NOMECOMPLETO LIKE '%${nome}%' AND CPF LIKE '%${cpf}%'
+      FROM FICHA 
+      WHERE ATIVO = "${ativo}" AND NOMECOMPLETO LIKE '%${nome}%' AND CPF LIKE '%${cpf}%'
       ORDER BY NOMECOMPLETO ASC
-      LIMIT ${limit} OFFSET ${offset}`);
+      LIMIT ${limit} OFFSET ${offset}
+  `);
 
       return {
         fichasCandidatos: rows,
