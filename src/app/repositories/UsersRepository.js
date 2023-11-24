@@ -4,7 +4,7 @@ class UsersRepository {
   async signIn(email, password) {
     try {
       const [rows] = await pool.query(
-        'SELECT USUARIO, ATIVO, IDUSUARIO FROM USUARIO WHERE EMAIL = ? AND SENHA = ?',
+        'SELECT USUARIO, ATIVO, IDUSUARIO FROM USUARIO WHERE EMAIL = ? AND SENHA = ? AND ATIVO = "S"',
         [email, password]
       );
       return rows;
