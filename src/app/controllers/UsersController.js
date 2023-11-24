@@ -69,8 +69,16 @@ class UsersController {
 
       // Verificar se os dados já estão no cache
       let cachedData = usersCache.get(cacheKey);
-
       if (!cachedData) {
+        const users = await UsersRepository.getUsers(limit, offset, ativo);
+        cachedData = {
+          users: users.users,
+          totalDeUsuarios: users.totalDeUsuarios,
+        };
+
+        // Armazenar no cache
+        usersCache.set(cacheKey, cachedData);
+      } else {
         const users = await UsersRepository.getUsers(limit, offset, ativo);
         cachedData = {
           users: users.users,
