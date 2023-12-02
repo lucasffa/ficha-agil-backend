@@ -174,5 +174,59 @@ class FichaCandidatoController {
       });
     }
   }
+
+  async deleteBeneficio(request, response) {
+    try {
+      const idBeneficio = request.query.idBeneficio;
+      const idFicha = request.query.idFicha;
+      await FichaCandidatoRepository.deleteBeneficio(idFicha, idBeneficio);
+
+      return response.status(200).json({
+        message: 'Benefício deletado com sucesso',
+      });
+    } catch (err) {
+      return response.status(401).json({
+        message: err.message,
+      });
+    }
+  }
+
+  async deleteCompFamiliar(request, response) {
+    try {
+      const idCompFamiliar = request.query.idCompFamiliar;
+      const idFicha = request.query.idFicha;
+      await FichaCandidatoRepository.deleteCompFamiliar(
+        idFicha,
+        idCompFamiliar
+      );
+
+      return response.status(200).json({
+        message: 'Composição familiar deletada com sucesso',
+      });
+    } catch (err) {
+      return response.status(401).json({
+        message: err.message,
+      });
+    }
+  }
+
+  async deleteGrupoFamiliar(request, response) {
+    try {
+      const idGrupoFamiliar = request.query.idGrupoFamiliar;
+      const idFicha = request.query.idFicha;
+      await FichaCandidatoRepository.deleteGrupoFamiliar(
+        idFicha,
+        idGrupoFamiliar
+      );
+
+      return response.status(200).json({
+        message: 'Grupo familiar deletado com sucesso',
+      });
+    } catch (err) {
+      return response.status(401).json({
+        message: err.message,
+      });
+    }
+  }
 }
 module.exports = new FichaCandidatoController();

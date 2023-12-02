@@ -269,9 +269,16 @@ class FichaCandidatoRepository {
 
   async getFichaById(id) {
     try {
-      const ficha = await pool.query('SELECT * FROM FICHA WHERE IDFICHA = ?', [
-        id,
-      ]);
+      const ficha = await pool.query(
+        `SELECT *, 
+      CONVERT(DESPESASOBS USING utf8) as DESPESASOBSAUX, 
+      CONVERT(OUTROSGASTOS USING utf8) as OUTROSGASTOSAUX,
+      CONVERT(SITSOCIOECONOMICOFAMILIAR USING utf8) as SITSOCIOECONOMICOFAMILIARAUX,
+      CONVERT(OBSERVACOESNECESSARIAS USING utf8) as OBSERVACOESNECESSARIASAUX,
+      CONVERT(PARECERASSISTSOCIAL USING utf8) as PARECERASSISTSOCIALAUX
+      FROM FICHA WHERE IDFICHA = ?`,
+        [id]
+      );
 
       const beneficio = await pool.query(
         `
@@ -475,112 +482,119 @@ class FichaCandidatoRepository {
       //update nas tabelas que possuem relacionamento com a ficha
       if (updateFicha.affectedRows > 0 && fichaCandidato.IDFICHA !== null) {
         try {
-          await Promise.all(
-            fichaCandidato.BENEFICIOSPLEITEADOS?.map(async element => {
-              const beneficioExistente = await pool.query(
-                'SELECT * FROM BENEFICIOS WHERE IDBENEFICIO = ?',
-                [element.IdBeneficio]
-              );
+          if (fichaCandidato.BENEFICIOSPLEITEADOS !== undefined) {
+            await Promise.all(
+              fichaCandidato.BENEFICIOSPLEITEADOS?.map(async element => {
+                const beneficioExistente = await pool.query(
+                  'SELECT * FROM BENEFICIOS WHERE IDBENEFICIO = ?',
+                  [element.IdBeneficio]
+                );
 
-              if (beneficioExistente.length > 0) {
-                return await pool.query(
-                  'UPDATE BENEFICIOS SET PRIORIDADE = ? , ATIVIDADECURSO = ?, TURNO = ?, HORARIO = ? WHERE IDFICHA = ? AND IDBENEFICIO = ?',
-                  [
-                    null,
-                    element.NomeCursoPretendido,
-                    element.Turno,
-                    element.Horario,
-                    fichaCandidato.IDFICHA,
-                    element.IdBeneficio,
-                  ]
-                );
-              } else {
-                return await pool.query(
-                  'INSERT INTO BENEFICIOS (IDFICHA, PRIORIDADE, ATIVIDADECURSO, TURNO, HORARIO) VALUES (?, ?, ?, ?, ?)',
-                  [
-                    fichaCandidato.IDFICHA,
-                    null,
-                    element.NomeCursoPretendido,
-                    element.Turno,
-                    element.Horario,
-                  ]
-                );
-              }
-            })
-          );
+                if (beneficioExistente.length > 0) {
+                  return await pool.query(
+                    'UPDATE BENEFICIOS SET PRIORIDADE = ? , ATIVIDADECURSO = ?, TURNO = ?, HORARIO = ? WHERE IDFICHA = ? AND IDBENEFICIO = ?',
+                    [
+                      null,
+                      element.NomeCursoPretendido,
+                      element.Turno,
+                      element.Horario,
+                      fichaCandidato.IDFICHA,
+                      element.IdBeneficio,
+                    ]
+                  );
+                } else {
+                  return await pool.query(
+                    'INSERT INTO BENEFICIOS (IDFICHA, PRIORIDADE, ATIVIDADECURSO, TURNO, HORARIO) VALUES (?, ?, ?, ?, ?)',
+                    [
+                      fichaCandidato.IDFICHA,
+                      null,
+                      element.NomeCursoPretendido,
+                      element.Turno,
+                      element.Horario,
+                    ]
+                  );
+                }
+              })
+            );
+          }
 
-          await Promise.all(
-            fichaCandidato.GRUPOFAMILIAR?.map(async element => {
-              const grupoFamiliarExistente = await pool.query(
-                'SELECT * FROM GRUPOFAMILIAR WHERE IDGRUPOFAMILIAR = ?',
-                [element.IdGrupoFamiliar]
-              );
-              if (grupoFamiliarExistente.length > 0) {
-                const insertGrupoFamiliar = await pool.query(
-                  'UPDATE GRUPOFAMILIAR SET IDFICHAFAMILIAR = ?, IDPARENTESCO = ? WHERE IDGRUPOFAMILIAR = ?',
-                  [
-                    element.IdFichaFamiliar,
-                    element.IdParentesco,
-                    element.IdGrupoFamiliar,
-                  ]
+          if (fichaCandidato.GRUPOFAMILIAR !== undefined) {
+            await Promise.all(
+              fichaCandidato.GRUPOFAMILIAR?.map(async element => {
+                const grupoFamiliarExistente = await pool.query(
+                  'SELECT * FROM GRUPOFAMILIAR WHERE IDGRUPOFAMILIAR = ?',
+                  [element.IdGrupoFamiliar]
                 );
-                return insertGrupoFamiliar;
-              } else {
-                const insertGrupoFamiliar = await pool.query(
-                  'INSERT INTO GRUPOFAMILIAR (IDFICHAPRINCIPAL, IDFICHAFAMILIAR, IDPARENTESCO) VALUES (?, ?, ?)',
-                  [
-                    fichaCandidato.IDFICHA,
-                    element.IdFichaFamiliar,
-                    element.IdParentesco,
-                  ]
-                );
-                return insertGrupoFamiliar;
-              }
-            })
-          );
-          await Promise.all(
-            fichaCandidato.COMPFAMILIAR?.map(async element => {
-              const compFamiliarExistente = await pool.query(
-                'SELECT * FROM COMPFAMILIAR WHERE IDFICHA = ? AND IDCOMPFAMILIAR = ?',
-                [fichaCandidato.IDFICHA, element.IdCompFamiliar]
-              );
+                if (grupoFamiliarExistente.length > 0) {
+                  const insertGrupoFamiliar = await pool.query(
+                    'UPDATE GRUPOFAMILIAR SET IDFICHAFAMILIAR = ?, IDPARENTESCO = ? WHERE IDGRUPOFAMILIAR = ?',
+                    [
+                      element.IdFichaFamiliar,
+                      element.IdParentesco,
+                      element.IdGrupoFamiliar,
+                    ]
+                  );
+                  return insertGrupoFamiliar;
+                } else {
+                  const insertGrupoFamiliar = await pool.query(
+                    'INSERT INTO GRUPOFAMILIAR (IDFICHAPRINCIPAL, IDFICHAFAMILIAR, IDPARENTESCO) VALUES (?, ?, ?)',
+                    [
+                      fichaCandidato.IDFICHA,
+                      element.IdFichaFamiliar,
+                      element.IdParentesco,
+                    ]
+                  );
+                  return insertGrupoFamiliar;
+                }
+              })
+            );
+          }
 
-              if (compFamiliarExistente.length > 0) {
-                const insertCompFamiliar = await pool.query(
-                  'UPDATE COMPFAMILIAR SET NOME = ?, IDPARENTESCO = ?, IDADE = ?, IDESTADOCIVIL = ?, PROFISSAO = ?, IDSITTRABALHISTA = ?, IDESCOLARIDADE = ?, RENDA = ? WHERE IDFICHA = ? AND IDCOMPFAMILIAR = ?',
-                  [
-                    element.Nome,
-                    element.IdParentesco,
-                    element.Idade,
-                    element.IdEstadoCivil,
-                    element.Profissao,
-                    element.IdSitTrabalhista,
-                    element.IdEscolaridade,
-                    element.Renda,
-                    fichaCandidato.IDFICHA,
-                    element.IdCompFamiliar,
-                  ]
+          if (fichaCandidato.COMPFAMILIAR !== undefined) {
+            await Promise.all(
+              fichaCandidato.COMPFAMILIAR?.map(async element => {
+                const compFamiliarExistente = await pool.query(
+                  'SELECT * FROM COMPFAMILIAR WHERE IDFICHA = ? AND IDCOMPFAMILIAR = ?',
+                  [fichaCandidato.IDFICHA, element.IdCompFamiliar]
                 );
-                return insertCompFamiliar;
-              } else {
-                const insertCompFamiliar = await pool.query(
-                  'INSERT INTO COMPFAMILIAR (IDFICHA, NOME, IDPARENTESCO, IDADE, IDESTADOCIVIL, PROFISSAO, IDSITTRABALHISTA, IDESCOLARIDADE, RENDA) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                  [
-                    fichaCandidato.IDFICHA,
-                    element.Nome,
-                    element.IdParentesco,
-                    element.Idade,
-                    element.IdEstadoCivil,
-                    element.Profissao,
-                    element.IdSitTrabalhista,
-                    element.IdEscolaridade,
-                    element.Renda,
-                  ]
-                );
-                return insertCompFamiliar;
-              }
-            })
-          );
+
+                if (compFamiliarExistente.length > 0) {
+                  const insertCompFamiliar = await pool.query(
+                    'UPDATE COMPFAMILIAR SET NOME = ?, IDPARENTESCO = ?, IDADE = ?, IDESTADOCIVIL = ?, PROFISSAO = ?, IDSITTRABALHISTA = ?, IDESCOLARIDADE = ?, RENDA = ? WHERE IDFICHA = ? AND IDCOMPFAMILIAR = ?',
+                    [
+                      element.Nome,
+                      element.IdParentesco,
+                      element.Idade,
+                      element.IdEstadoCivil,
+                      element.Profissao,
+                      element.IdSitTrabalhista,
+                      element.IdEscolaridade,
+                      element.Renda,
+                      fichaCandidato.IDFICHA,
+                      element.IdCompFamiliar,
+                    ]
+                  );
+                  return insertCompFamiliar;
+                } else {
+                  const insertCompFamiliar = await pool.query(
+                    'INSERT INTO COMPFAMILIAR (IDFICHA, NOME, IDPARENTESCO, IDADE, IDESTADOCIVIL, PROFISSAO, IDSITTRABALHISTA, IDESCOLARIDADE, RENDA) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                    [
+                      fichaCandidato.IDFICHA,
+                      element.Nome,
+                      element.IdParentesco,
+                      element.Idade,
+                      element.IdEstadoCivil,
+                      element.Profissao,
+                      element.IdSitTrabalhista,
+                      element.IdEscolaridade,
+                      element.Renda,
+                    ]
+                  );
+                  return insertCompFamiliar;
+                }
+              })
+            );
+          }
         } catch (error) {
           throw new Error(error);
         }
@@ -610,6 +624,42 @@ class FichaCandidatoRepository {
         fichasCandidatos: rows,
         totalDefichasCandidatos: totalPage?.length,
       };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteBeneficio(idFicha, idBeneficio) {
+    try {
+      const rows = await pool.query(
+        'DELETE FROM BENEFICIOS WHERE IDFICHA = ? AND IDBENEFICIO = ?',
+        [idFicha, idBeneficio]
+      );
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteCompFamiliar(idFicha, idCompFamiliar) {
+    try {
+      const rows = await pool.query(
+        'DELETE FROM COMPFAMILIAR WHERE IDFICHA = ? AND IDCOMPFAMILIAR = ?',
+        [idFicha, idCompFamiliar]
+      );
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteGrupoFamiliar(idFicha, idGrupoFamiliar) {
+    try {
+      const rows = await pool.query(
+        'DELETE FROM GRUPOFAMILIAR WHERE IDFICHAPRINCIPAL = ? AND IDGRUPOFAMILIAR = ?',
+        [idFicha, idGrupoFamiliar]
+      );
+      return rows;
     } catch (error) {
       throw error;
     }

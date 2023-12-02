@@ -51,22 +51,37 @@ router.get(
 );
 router.get('/fichas', authenticateToken, FichaCandidatoController.getFichas);
 router.get('/ficha', authenticateToken, FichaCandidatoController.getFichaById);
-
 router.put(
   `/updateFicha`,
   authenticateToken,
   FichaCandidatoController.updateFichaCandidato
 );
-
 router.delete(
   '/deleteFicha',
   authenticateToken,
   FichaCandidatoController.deleteFichaCandidato
 );
-
 router.get(
   '/fichaCandidatoFilter',
   authenticateToken,
   FichaCandidatoController.getFichaCandidatoFiltrado
 );
+router.delete(
+  '/deleteBeneficio',
+  authenticateToken,
+  FichaCandidatoController.deleteBeneficio
+);
+
+router.delete(
+  '/deleteCompFamiliar',
+  authenticateToken,
+  FichaCandidatoController.deleteCompFamiliar
+);
+
+router.delete(
+  '/deleteGrupoFamiliar',
+  authenticateToken,
+  FichaCandidatoController.deleteGrupoFamiliar
+);
+
 module.exports = router;
