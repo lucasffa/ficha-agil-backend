@@ -551,11 +551,12 @@ class FichaCandidatoRepository {
                   return insertGrupoFamiliar;
                 } else {
                   const insertGrupoFamiliar = await pool.query(
-                    'INSERT INTO GRUPOFAMILIAR (IDFICHAPRINCIPAL, IDFICHAFAMILIAR, IDPARENTESCO) VALUES (?, ?, ?)',
+                    'INSERT INTO GRUPOFAMILIAR (IDFICHAPRINCIPAL, IDFICHAFAMILIAR, IDPARENTESCO, NOMECOMPLETOFAMILIAR) VALUES (?, ?, ?, ?)',
                     [
                       fichaCandidato.IDFICHA,
                       element.IdFichaFamiliar,
                       element.IdParentesco,
+                      element.NomeCompletoFamiliar,
                     ]
                   );
                   return insertGrupoFamiliar;
